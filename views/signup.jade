@@ -1,0 +1,36 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title Login
+    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Lato:100,300,400')
+    link(rel='stylesheet', type='text/css', href='styles/main.css')
+  body
+    header.primary-header.container.group
+      h1.logo
+        a(href='/signup')
+          | Statistic 
+          br
+          |  analytics
+    section.row-alt
+      p
+        | "The first rule of any technology used in a business is that automation applied to 
+        br
+        | an efficient operation will magnify the efficiency." ~ Bill Gates
+        br
+    section.row
+      .grid
+        form(action='/signup', method='POST')
+          .signUpBox
+            img.loginLogo(src='https://camo.githubusercontent.com/1eb637728e16b9aa772f823d321210e1864aa09f/68747470733a2f2f662e636c6f75642e6769746875622e636f6d2f6173736574732f33323133342f3331383637332f63616361343831342d393861302d313165322d386161622d3930656338623838353136352e706e67')
+            input#username.signUpBoxInput(type='text', name='username', placeholder='Username', required='')
+            input#email.signUpBoxInput(type='email', name='email', placeholder='E-mail', required='')
+            input#password.signUpBoxInput(type='password', name='password', placeholder='Password', required='')
+            input.signUpBoxInput(type='submit', value='Sign up')
+            br
+    header.primary-header.container.group
+      hero.logoHero
+        | Copy right.™ 
+        a DREAMTEAM
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js')

@@ -1,0 +1,37 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title Reset password
+    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Lato:100,300,400')
+    link(rel='stylesheet', type='text/css', href='/styles/main.css')
+    link(rel='stylesheet', type='text/css', href='../public/stylesheets/main.css')
+  body
+    header.primary-header.container.group
+      h1.logo
+        a(href='/reset')
+          | Statistic 
+          br
+          |  analytics
+    section.row-alt
+      p
+        | "The first rule of any technology used in a business is that automation applied to 
+        br
+        | an efficient operation will magnify the efficiency." ~ Bill Gates
+        br
+    section.row
+      form(method='POST')
+        .forgotBox
+          h2 Reset Password
+          input#password.forgotBoxInput(type='text', name='password', placeholder='Password', required='', autofocus='')
+            
+          input#conf-password.forgotBoxInput(type='text', name='conf-password', placeholder='Confirm Password', required='', autofocus='')
+
+          input.forgotBoxInput(type='submit', value='Save password')
+          br
+    header.primary-header.container.group
+      hero.logoHero
+        | Copy right.™ 
+        a DREAMTEAM
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js')

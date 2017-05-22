@@ -1,0 +1,185 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title Statistic
+    link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Lato:100,300,400')
+    link(rel='stylesheet', type='text/css', href='styles/main.css')
+  body
+    header.primary-header.container.group
+      h1.logo
+        a(href='/')
+          | Statistic 
+          br
+          |  analytics
+      nav.nav.primary-nav
+        form.js-logout(action='/logout', method='POST')
+          a(href='/logout') Log Out
+    section.row-alt
+      p
+        | "The first rule of any technology used in a business is that automation applied to 
+        br
+        | an efficient operation will magnify the efficiency." ~ Bill Gates
+        br
+    section.row
+      .container.statsContainer
+        nav.nav.primary-nav
+          ul.timeMove
+            li
+              a(href='/' id="day") 1D 
+            li
+              a(href='/' id="week") 1W 
+            li
+              a(href='/' id="month") 1M 
+            li
+              a(href='/' id="all") All 
+        .statsBox
+          .statsBoxInfo
+            h4 Orders
+            p to fulfill
+          a#ordersFulfilled(type='number') 0
+        .statsBox
+          .statsBoxInfo
+            h4 Orders
+            p being processed
+          a#ordersProc(type='number') 0
+        .statsBox
+          .statsBoxInfo
+            h4 Orders
+            p have failed
+          a#ordersFailed(type='number') 0
+      .dougnBox
+        canvas#myChart
+    header.primary-header.container.group
+      hero.logoHero
+        | Copy right.™ 
+        a DREAMTEAM
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.js')
+    script.
+      var chart = document.getElementById("myChart");
+      var myDoughnutChart = new Chart(chart, {
+      type: 'doughnut',
+      data: {
+      labels: [
+        "Orders failed",
+        "Orders to fulfill",
+        "Orders processed"
+        ],
+        datasets: [
+          {
+            data: [0, 0, 0],
+            backgroundColor: [
+              "#FF6384",
+              "#36A2EB",
+              "#FFCE56"
+        ],
+        hoverBackgroundColor: [
+              "#FF6384",
+              "#36A2EB",
+              "#FFCE56"
+            ]
+          }]
+        },
+        options: {
+          responsive: true
+          },
+        });
+
+      var socket = io("http://localhost:3001");
+      var socket1 = io("http://localhost:3001");
+      var socket2 = io("http://localhost:3001");
+      var socket3 = io("http://localhost:3001");
+      var socketStart = io("http://localhost:3001");
+
+      function loadStats(socketName, name1, name2, name3){
+        socketName.on(name1, function (data) {
+            console.log("Processed orders: " + data);
+            $("#ordersProc").text(data);
+            myDoughnutChart.data.datasets[0].data[2] = data;
+            myDoughnutChart.update();
+        });
+          
+        socketName.on(name2, function (data) {
+            console.log("Failed orders: " + data);
+            $("#ordersFailed").text(data);
+            myDoughnutChart.data.datasets[0].data[0] = data;
+            myDoughnutChart.update();
+        });
+
+        socketName.on(name3, function (data) {
+            console.log("Fulfiled orders: " + data);
+            $("#ordersFulfilled").text(data);
+            myDoughnutChart.data.datasets[0].data[1] = data;
+            myDoughnutChart.update();
+        });
+      }
+      
+      loadStats(socketStart, 'process', 'failed', 'fulfill');
+
+      $("#all").on('click', function(event){
+        event.preventDefault();
+
+        //Turn of other sockets
+        socketStart.off();
+        socket1.off();
+        socket2.off();
+        socket3.off();
+
+        console.log("All clicked");
+        
+        loadStats(socket, 'process', 'failed', 'fulfill');
+      });
+
+      $("#day").on('click', function(event){
+        event.preventDefault();
+        //Turn of other sockets
+        socketStart.off();
+        socket.off();
+        socket2.off();
+        socket3.off();
+        
+
+        console.log('Day clicked')
+
+        loadStats(socket1, 'processDay', 'failedDay', 'fulfillDay');
+      });
+
+      $("#week").on('click', function(event){
+        event.preventDefault();
+
+        //Turn of other sockets
+        socketStart.off();
+        socket1.off();
+        socket.off();
+        socket3.off();
+
+        console.log("Week clicked");
+        
+        loadStats(socket2, 'processWeek', 'failedWeek', 'fulfillWeek');
+      });
+
+      $("#month").on('click', function(event){
+        event.preventDefault();
+
+        //Turn of other sockets
+        socketStart.off();
+        socket1.off();
+        socket2.off();
+        socket.off();
+
+        console.log("Month clicked");
+
+        loadStats(socket3, 'processMonth', 'failedMonth', 'fulfillMonth');
+      });
+
+      
+
+      
+
+
+      
+
+
+    
