@@ -124,115 +124,69 @@ function membersOnly(req, res, val) {
   }
 }
 
+// Count orders from database
+function checkOrder(Onwer, Status, index){
+  setInterval(function(){
+      Order.count({owner : Onwer, status : Status}, function(err, c) {
+      io.sockets.emit(index, c);
+    });
+  }, 1000);
+}
+
+function checkOrdersWithDate(Onwer, Status, date, index){
+  setInterval(function(){
+      Order.count({owner : Onwer, status : Status, DATE : date}, function(err, c) {
+      io.sockets.emit(index, c);
+    });
+  }, 1000);
+}
+
+// Fetch data from database
+function getOrders(user, thisSocket){
+
+      //All
+      checkOrder(user, 0, 'process', thisSocket);
+
+      checkOrder(user, 2,'fulfill', thisSocket);
+
+      checkOrder(user, 3,'failed', thisSocket);
+
+      //Day
+      checkOrdersWithDate(user, 0, {$gte: "2017-05-07" }, 'processDay');
+
+      checkOrdersWithDate(user, 2, {$gte: "2017-05-07" },'fulfillDay');
+
+      checkOrdersWithDate(user, 3, {$gte: "2017-05-07" }, 'failedDay');
+      
+      //Week
+      checkOrdersWithDate(user, 0, { $gte : "2017-05-00" , $lte: "2017-05-07" }, 'processWeek');
+
+      checkOrdersWithDate(user, 2, { $gte : "2017-05-00", $lte: "2017-05-07" }, 'fulfillWeek');
+
+      checkOrdersWithDate(user, 3, { $gte : "2017-05-00", $lte: "2017-05-07" }, 'failedWeek');
+      
+      //Month
+      checkOrdersWithDate(user, 0, { $gt : "2017-04-00"}, 'processMonth');
+
+      checkOrdersWithDate(user, 2, { $gt : "2017-04-00"}, 'fulfillMonth');
+
+      checkOrdersWithDate(user, 3, { $gt : "2017-04-00"}, 'failedMonth');
+}
 
 // Routes
 app.get('/', function(req, res) {
   membersOnly(req, res, 1);
   res.render('index', {username: req.user.username});
-  
+
+  //Get user thats logged in
+  var currentUser = req.user.username;
+
   io.on('connection', function(socket){
-    console.log('a user connected');
+    console.log("This user logged in: " + currentUser);
 
-    console.log("This user logged in: " + req.user.username);
-    
-    
-    var currentUser = req.user.username;
-    //All
-    Order.count({owner: currentUser, status : 0}, function(err, c) {
-           console.log('Processed orders: ' + c);
-           var Processed = c;
-           setInterval(function(){
-           socket.emit('process', Processed);
-           }, 1000);
-      });
-    Order.count({owner: currentUser, status : 2}, function(err, c) {
-           console.log('Fulfilled orders: ' + c);
-           var Fulfilled = c;
-           setInterval(function(){
-           socket.emit('fulfill', Fulfilled);
-           }, 1000);
-      });
-    Order.count({owner: currentUser, status : 3}, function(err, c) {
-           console.log('Failed orders: ' + c);
-           var Failed = c;
-           setInterval(function(){
-           socket.emit('failed', Failed);
-           }, 1000);
-      });
-
-    //Day
-    Order.count({owner: currentUser, status : 0, DATE : {$gte: "2017-05-07" }}, function(err, c) {
-           console.log('Processed orders: ' + c);
-           var Processed = c;
-           setInterval(function(){
-           socket.emit('processDay', Processed);
-           }, 1000);
-      });
-    Order.count({owner: currentUser, status : 2,DATE : {$gte: "2017-05-07" }}, function(err, c) {
-           console.log('Fulfilled orders: ' + c);
-           var Fulfilled = c;
-           setInterval(function(){
-           socket.emit('fulfillDay', Fulfilled);
-           }, 1000);
-      });
-    Order.count({owner: currentUser, status : 3, DATE : {$gte: "2017-05-07" }}, function(err, c) {
-           console.log('Failed orders: ' + c);
-           var Failed = c;
-           setInterval(function(){
-           socket.emit('failedDay', Failed);
-           }, 1000);
-      });
-
-    //Week
-    Order.count({owner: currentUser, status : 0, DATE :{ $gte : "2017-05-00" , $lte: "2017-05-07" }}, function(err, c) {
-           console.log('Processed orders: ' + c);
-           var Processed = c;
-           setInterval(function(){
-           socket.emit('processWeek', Processed);
-           }, 1000);
-      });
-    Order.count({owner: currentUser, status : 2,DATE :{ $gte : "2017-05-00", $lte: "2017-05-07" }}, function(err, c) {
-           console.log('Fulfilled orders: ' + c);
-           var Fulfilled = c;
-           setInterval(function(){
-           socket.emit('fulfillWeek', Fulfilled);
-           }, 1000);
-      });
-    Order.count({owner: currentUser, status : 3, DATE :{ $gte : "2017-05-00", $lte: "2017-05-07" }}, function(err, c) {
-           console.log('Failed orders: ' + c);
-           var Failed = c;
-           setInterval(function(){
-           socket.emit('failedWeek', Failed);
-           }, 1000);
-      });
-    
-    //Month
-    Order.count({owner: currentUser, status : 0, DATE :{ $gt : "2017-04-00"}}, function(err, c) {
-           console.log('Processed orders: ' + c);
-           var Processed = c;
-           setInterval(function(){
-           socket.emit('processMonth', Processed);
-           }, 1000);
-      });
-    Order.count({owner: currentUser, status : 2,DATE :{ $gt : "2017-04-00"}}, function(err, c) {
-           console.log('Fulfilled orders: ' + c);
-           var Fulfilled = c;
-           setInterval(function(){
-           socket.emit('fulfillMonth', Fulfilled);
-           }, 1000);
-      });
-    Order.count({owner: currentUser, status : 3, DATE :{ $gt : "2017-04-00"}}, function(err, c) {
-           console.log('Failed orders: ' + c);
-           var Failed = c;
-           setInterval(function(){
-           socket.emit('failedMonth', Failed);
-           }, 1000);
-      });
-    });
+    getOrders(currentUser, socket);
   });
-
-
-
+});
 
 
 app.get('/404', function(req, res){

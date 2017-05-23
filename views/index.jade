@@ -2,6 +2,7 @@ doctype html
 html
   head
     meta(charset='utf-8')
+
     title Statistic
     link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Lato:100,300,400')
     link(rel='stylesheet', type='text/css', href='styles/main.css')
@@ -54,10 +55,14 @@ html
       hero.logoHero
         | Copy right.™ 
         a DREAMTEAM
+
+        a
     script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js')
     script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.bundle.js')
+    script(type='text/javascript')
     script.
+
       var chart = document.getElementById("myChart");
       var myDoughnutChart = new Chart(chart, {
       type: 'doughnut',
@@ -97,6 +102,7 @@ html
         socketName.on(name1, function (data) {
             console.log("Processed orders: " + data);
             $("#ordersProc").text(data);
+
             myDoughnutChart.data.datasets[0].data[2] = data;
             myDoughnutChart.update();
         });
@@ -104,6 +110,7 @@ html
         socketName.on(name2, function (data) {
             console.log("Failed orders: " + data);
             $("#ordersFailed").text(data);
+
             myDoughnutChart.data.datasets[0].data[0] = data;
             myDoughnutChart.update();
         });
@@ -111,6 +118,7 @@ html
         socketName.on(name3, function (data) {
             console.log("Fulfiled orders: " + data);
             $("#ordersFulfilled").text(data);
+            
             myDoughnutChart.data.datasets[0].data[1] = data;
             myDoughnutChart.update();
         });
@@ -120,7 +128,6 @@ html
 
       $("#all").on('click', function(event){
         event.preventDefault();
-
         //Turn of other sockets
         socketStart.off();
         socket1.off();
